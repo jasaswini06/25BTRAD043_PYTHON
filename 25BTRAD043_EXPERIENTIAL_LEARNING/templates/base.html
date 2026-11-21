@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=5.0" name="viewport"/>
+    <title>{% block title %}Campus Findr — University Lost &amp; Found Directory{% endblock %}</title>
+    <meta content="Central campus lost and found registry. Student Council &amp; Campus Security directory for misplaced campus property." name="description"/>
+    
+    <!-- Typography -->
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Geist', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+              mono: ['JetBrains Mono', 'Menlo', 'Monaco', 'Courier New', 'monospace'],
+            },
+            colors: {
+              brand: {
+                deep: '#1b4332',
+                primary: '#2d5a43',
+                hover: '#143426',
+                sage: '#edf6f0',
+                sageBorder: '#c6e3cf',
+                sageText: '#23643b'
+              },
+              terracotta: {
+                DEFAULT: '#c85a32',
+                hover: '#b94e27',
+                bg: '#fdf5f0',
+                border: '#f5d6c8'
+              },
+              ochre: {
+                bg: '#fdf8ed',
+                border: '#e8cfa1',
+                text: '#8c5b08'
+              },
+              peat: '#1c2520',
+              moss: '#55635b',
+              muted: '#7e8c84',
+              canvas: '#fbfaf7',
+              warmCard: '#f5f3ee',
+              warmBorder: '#e6e2d8',
+              warmBorderSubtle: '#ebe7df'
+            },
+            boxShadow: {
+              subtle: '0 1px 3px rgba(28,25,23,0.04), 0 1px 2px rgba(28,25,23,0.02)',
+              'subtle-hover': '0 3px 6px rgba(28,25,23,0.06), 0 1px 3px rgba(28,25,23,0.03)'
+            }
+          }
+        }
+      }
+    </script>
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body class="bg-[#fbfaf7] text-[#1c2520] font-sans min-h-screen antialiased flex flex-col selection:bg-[#c6e3cf] selection:text-[#1b4332]">
+
+    <!-- Utility Header / Top Navigation -->
+    <header class="sticky top-0 z-40 bg-[#fbfaf7]/95 backdrop-blur-md border-b border-[#e6e2d8]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-4">
+            <!-- Brand & Project Identity -->
+            <div class="flex items-center gap-3">
+                <a class="flex items-center gap-2.5 text-[#1c2520] font-semibold tracking-tight hover:opacity-85 transition-opacity" href="{{ url_for('index') }}">
+                    <div class="w-7 h-7 rounded bg-[#2d5a43] text-white flex items-center justify-center shadow-xs">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24">
+                            <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10l8 4" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                    </div>
+                    <span class="text-sm font-semibold tracking-tight text-[#1c2520]">Campus Findr</span>
+                </a>
+                <span class="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-mono font-medium bg-[#f0ede6] text-[#55635b] border border-[#e2ddd3]">v2.6</span>
+                <span class="hidden md:inline text-[#d4cec3] text-xs">|</span>
+                <span class="hidden md:inline text-xs text-[#55635b] font-medium truncate">Campus Registry &amp; Student Council</span>
+            </div>
+
+            <!-- Center Links (Utility Navigation) -->
+            <nav class="hidden lg:flex items-center gap-6 text-xs font-medium text-[#55635b]">
+                <a class="text-[#1c2520] font-semibold hover:text-[#2d5a43] transition-colors" href="{{ url_for('index') }}#items-section">Directory</a>
+                <a class="hover:text-[#1c2520] transition-colors" href="{{ url_for('index') }}#protocol-section">Verification Protocol</a>
+                <a class="hover:text-[#1c2520] transition-colors" href="{{ url_for('index') }}#dropoff-section">Drop-off Points</a>
+                <a class="hover:text-[#1c2520] transition-colors" href="{{ url_for('index') }}#security-section">Security Desk</a>
+            </nav>
+
+            <!-- Actions -->
+            <div class="flex items-center gap-2.5">
+                <button class="hidden sm:flex items-center gap-2 px-2.5 py-1.5 rounded-md border border-[#e6e2d8] bg-white hover:bg-[#f5f3ee] text-xs text-[#55635b] transition-colors shadow-subtle" id="quick-search-trigger">
+                    <svg class="w-3.5 h-3.5 text-[#7e8c84]" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                    <span>Search registry</span>
+                    <span class="kbd ml-1">/</span>
+                </button>
+                <button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#2d5a43] hover:bg-[#143426] text-white text-xs font-medium shadow-subtle transition-all duration-150 ease-out hover:-translate-y-[1px] hover:shadow-sm active:translate-y-0 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-[#2d5a43]/30" id="open-report-modal-btn">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewbox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round"></path></svg>
+                    <span>Report Item</span>
+                </button>
+                <a class="w-8 h-8 rounded-md border border-[#e6e2d8] bg-white flex items-center justify-center text-[#55635b] hover:bg-[#f5f3ee] hover:text-[#1c2520] transition-colors shadow-subtle" href="{{ url_for('index') }}#protocol-section" title="Security Desk Info">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ====== Flash Messages ====== -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 w-full space-y-2">
+            {% for category, message in messages %}
+            <div class="p-3.5 rounded-lg text-xs font-medium flex items-center justify-between border shadow-subtle
+                {% if category == 'error' %}bg-[#fdf5f0] border-[#f5d6c8] text-[#b94e27]
+                {% elif category == 'success' %}bg-[#edf6f0] border-[#c6e3cf] text-[#23643b]
+                {% else %}bg-[#fdf8ed] border-[#e8cfa1] text-[#8c5b08]{% endif %}">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full {% if category == 'error' %}bg-[#c85a32]{% elif category == 'success' %}bg-[#2d5a43]{% else %}bg-[#8c5b08]{% endif %}"></span>
+                    <span>{{ message }}</span>
+                </div>
+                <button onclick="this.parentElement.remove()" class="text-[#7e8c84] hover:text-[#1c2520] font-mono text-sm leading-none">&times;</button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- ====== Main Body Content ====== -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Authentic University Project Footer -->
+    <footer class="bg-[#f5f3ee] border-t border-[#e6e2d8] mt-12 text-[#55635b] text-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 pb-6 border-b border-[#e2ddd3]">
+                <!-- Project & Lab Info -->
+                <div class="space-y-2 md:col-span-2">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded bg-[#2d5a43]"></span>
+                        <span class="font-semibold text-[#1c2520]">Campus Findr Registry System</span>
+                    </div>
+                    <p class="text-[#55635b] max-w-md">
+                        Developed as a B.Tech Computer Science &amp; Engineering 3rd Semester software engineering lab project. Built to resolve student property claims with verifiable telemetry and physical custody logs.
+                    </p>
+                    <div class="flex items-center gap-3 pt-1 text-[#7e8c84] font-mono text-[11px]">
+                        <span>Branch: CSE-2025</span>
+                        <span>•</span>
+                        <span>Batch: 2024–2028</span>
+                        <span>•</span>
+                        <a class="hover:text-[#1c2520] underline flex items-center gap-1 transition-colors" href="https://github.com/anshsingh752100-crypto/campus-findr" rel="noreferrer" target="_blank">
+                            <span>GitHub Repo</span>
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><path d="M15 3h6v6"></path><path d="m10 14 11-11"></path></svg>
+                        </a>
+                    </div>
+                </div>
+                <!-- Campus Safety Quick Links -->
+                <div class="space-y-1.5">
+                    <div class="font-semibold text-[#1c2520] mb-2">Campus Administration</div>
+                    <div><a class="hover:text-[#1c2520] transition-colors" href="{{ url_for('index') }}#protocol-section">Safety Guidelines</a></div>
+                    <div><a class="hover:text-[#1c2520] transition-colors" href="{{ url_for('index') }}#dropoff-section">Drop-off Boxes</a></div>
+                    <div><a class="hover:text-[#1c2520] transition-colors" href="{{ url_for('index') }}#security-section">Security Desk Hours</a></div>
+                    <div><a class="hover:text-[#1c2520] transition-colors" href="{{ url_for('report') }}">Post New Report</a></div>
+                </div>
+                <!-- Compliance & Legal -->
+                <div class="space-y-1.5">
+                    <div class="font-semibold text-[#1c2520] mb-2">Policy &amp; Inquiries</div>
+                    <div><a class="hover:text-[#1c2520] transition-colors" href="{{ url_for('index') }}#protocol-section">Privacy Policy</a></div>
+                    <div><a class="hover:text-[#1c2520] transition-colors" href="{{ url_for('index') }}#protocol-section">Terms of Custody</a></div>
+                    <div><a class="hover:text-[#1c2520] transition-colors" href="{{ url_for('index') }}#protocol-section">Dispute Escalation</a></div>
+                    <div><a class="hover:text-[#1c2520] transition-colors" href="mailto:security@campus.edu">security@campus.edu</a></div>
+                </div>
+            </div>
+            <div class="pt-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-[#7e8c84] text-[11px]">
+                <div>
+                    &copy; 2026 Campus Findr. University Department of Computer Science &amp; Engineering.
+                </div>
+                <div class="font-mono">
+                    Status: All services operational • Central Registry Node 12
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div class="fixed bottom-4 right-4 z-50 transform translate-y-16 opacity-0 transition-all duration-200 pointer-events-none" id="toast">
+        <div class="bg-[#1c2520] text-white px-3.5 py-2.5 rounded-lg shadow-lg flex items-center gap-2 text-xs font-medium border border-[#2d5a43]/30">
+            <svg class="w-4 h-4 text-[#85f8c4]" fill="none" id="toast-icon-svg" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke-linecap="round" stroke-linejoin="round"></path><path d="M22 4 12 14.01l-3-3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <span id="toast-msg">Action completed successfully.</span>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

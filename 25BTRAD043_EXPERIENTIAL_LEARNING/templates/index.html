@@ -1,0 +1,467 @@
+{% extends "base.html" %}
+{% block title %}Campus Findr — University Lost &amp; Found Directory{% endblock %}
+
+{% block content %}
+<!-- Intentional Functional Utility Header -->
+<section class="animate-reveal-1 bg-white border border-[#e6e2d8] rounded-lg p-5 sm:p-6 shadow-subtle">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="space-y-1">
+            <div class="flex items-center gap-2">
+                <span class="inline-block w-2 h-2 rounded-full bg-[#2d5a43]"></span>
+                <span class="text-xs font-mono font-medium uppercase tracking-wider text-[#55635b]">Central University Registry</span>
+            </div>
+            <h1 class="text-xl sm:text-2xl font-semibold text-[#1c2520] tracking-tight">Campus Lost &amp; Found</h1>
+            <p class="text-sm text-[#55635b] max-w-2xl">
+                Report, search, and reclaim misplaced items across campus. Maintained in coordination with Campus Security and Student Welfare.
+            </p>
+        </div>
+        <!-- Real DB Metric Badge Row with Count-Up -->
+        {% set total_count = items | length %}
+        {% set lost_count = items | selectattr('item_type', 'equalto', 'lost') | list | length %}
+        {% set found_count = items | selectattr('item_type', 'equalto', 'found') | list | length %}
+        {% set open_count = items | selectattr('status', 'equalto', 'open') | list | length %}
+        <div class="flex items-center flex-wrap gap-2 text-xs font-mono pt-2 md:pt-0">
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded border border-[#e6e2d8] bg-[#fbfaf7]">
+                <span class="text-[#7e8c84]">Total Items:</span>
+                <span class="font-semibold text-[#1c2520] counter-stat" data-target="{{ total_count }}">{{ total_count }}</span>
+            </div>
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded border border-[#f5d6c8] bg-[#fdf5f0]">
+                <span class="text-[#c85a32]">Lost:</span>
+                <span class="font-semibold text-[#b94e27] counter-stat" data-target="{{ lost_count }}">{{ lost_count }}</span>
+            </div>
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded border border-[#c6e3cf] bg-[#edf6f0]">
+                <span class="text-[#23643b]">Found:</span>
+                <span class="font-semibold text-[#1b4332] counter-stat" data-target="{{ found_count }}">{{ found_count }}</span>
+            </div>
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded border border-[#e6e2d8] bg-[#fbfaf7]">
+                <span class="text-[#7e8c84]">Open Cases:</span>
+                <span class="font-semibold text-[#1c2520] counter-stat" data-target="{{ open_count }}">{{ open_count }}</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Operational Alert / Verification Desk Info Notice -->
+<div class="animate-reveal-2 bg-[#fdf8ed] border border-[#e8cfa1] rounded-lg p-3.5 sm:px-4 flex items-start gap-3 text-xs text-[#8c5b08] shadow-subtle">
+    <svg class="w-4 h-4 text-[#b87c12] shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4m0-4h.01" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+    <div class="flex-1 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+        <p>
+            <strong class="font-semibold text-[#6f4504]">Security Protocol Notice:</strong> Physical handover &amp; verification occurs exclusively at <strong>Campus Security Desk (Block C, Ground Floor)</strong> between <strong>09:00 AM – 05:30 PM</strong>. Valid student/faculty ID required.
+        </p>
+        <a class="underline hover:text-[#523303] font-medium shrink-0 transition-colors" href="#protocol-section">View full checklist &rarr;</a>
+    </div>
+</div>
+
+<!-- Search, Filters, and Table Toolbar -->
+<section class="animate-reveal-3 flex flex-col gap-3" id="items-section">
+    <div class="bg-white border border-[#e6e2d8] rounded-lg p-3 shadow-subtle flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        <!-- Search Input -->
+        <div class="relative flex-1" id="search-wrapper">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#7e8c84]">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            </div>
+            <input class="w-full h-9 pl-9 pr-8 text-xs sm:text-sm bg-[#fbfaf7] border border-[#e6e2d8] rounded-md focus:bg-white focus:outline-none focus:border-[#2d5a43] focus:ring-2 focus:ring-[#2d5a43]/15 text-[#1c2520] placeholder:text-[#7e8c84] transition-all duration-150" id="search-input" placeholder="Search by item title, location, or reference ID... (press '/' to focus)" type="text"/>
+            <button class="hidden absolute inset-y-0 right-0 pr-2.5 flex items-center text-[#7e8c84] hover:text-[#1c2520] transition-colors" id="clear-search-btn" title="Clear search">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" stroke-linecap="round"></path></svg>
+            </button>
+        </div>
+
+        <!-- Filter Segmented Controls -->
+        <div class="flex items-center flex-wrap gap-2 text-xs">
+            <!-- Type Filter -->
+            <div class="inline-flex rounded-md border border-[#e6e2d8] p-0.5 bg-[#f5f3ee] text-[#55635b]" id="type-filter-group">
+                <button class="filter-type-btn px-2.5 py-1 rounded text-xs font-medium transition-all duration-150 bg-white text-[#1c2520] shadow-xs" data-type="all">All</button>
+                <button class="filter-type-btn px-2.5 py-1 rounded text-xs font-medium transition-all duration-150 text-[#55635b] hover:text-[#1c2520]" data-type="LOST">Lost</button>
+                <button class="filter-type-btn px-2.5 py-1 rounded text-xs font-medium transition-all duration-150 text-[#55635b] hover:text-[#1c2520]" data-type="FOUND">Found</button>
+            </div>
+            <!-- Status Filter -->
+            <div class="inline-flex rounded-md border border-[#e6e2d8] p-0.5 bg-[#f5f3ee] text-[#55635b]" id="status-filter-group">
+                <button class="filter-status-btn px-2.5 py-1 rounded text-xs font-medium transition-all duration-150 bg-white text-[#1c2520] shadow-xs" data-status="all">Any Status</button>
+                <button class="filter-status-btn px-2.5 py-1 rounded text-xs font-medium transition-all duration-150 text-[#55635b] hover:text-[#1c2520]" data-status="Open">Open</button>
+                <button class="filter-status-btn px-2.5 py-1 rounded text-xs font-medium transition-all duration-150 text-[#55635b] hover:text-[#1c2520]" data-status="Claimed">Claimed</button>
+            </div>
+            <!-- Reset Button -->
+            <button class="hidden text-xs text-[#55635b] hover:text-[#1c2520] underline px-1 transition-colors" id="reset-all-filters">
+                Reset
+            </button>
+        </div>
+    </div>
+
+    <!-- Secondary Category Pill Strip -->
+    <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs text-[#55635b] scrollbar-none" id="category-filter-group">
+        <span class="text-[#7e8c84] font-mono text-[11px] uppercase tracking-wider pl-1 pr-1 shrink-0">Category:</span>
+        <button class="filter-cat-btn px-2.5 py-1 rounded border border-[#2d5a43] bg-[#2d5a43] font-medium text-white shadow-xs shrink-0 transition-all duration-150" data-cat="all">All ({{ items|length }})</button>
+        <button class="filter-cat-btn px-2.5 py-1 rounded border border-[#e6e2d8] bg-white font-normal hover:bg-[#f5f3ee] hover:text-[#1c2520] text-[#55635b] shrink-0 transition-all duration-150" data-cat="Electronics">Electronics ({{ items|selectattr('category', 'in', ['electronics', 'Electronics'])|list|length }})</button>
+        <button class="filter-cat-btn px-2.5 py-1 rounded border border-[#e6e2d8] bg-white font-normal hover:bg-[#f5f3ee] hover:text-[#1c2520] text-[#55635b] shrink-0 transition-all duration-150" data-cat="ID Card">ID Cards ({{ items|selectattr('category', 'in', ['id_card', 'ID Card'])|list|length }})</button>
+        <button class="filter-cat-btn px-2.5 py-1 rounded border border-[#e6e2d8] bg-white font-normal hover:bg-[#f5f3ee] hover:text-[#1c2520] text-[#55635b] shrink-0 transition-all duration-150" data-cat="Bottle">Bottles ({{ items|selectattr('category', 'in', ['bottle', 'Bottle'])|list|length }})</button>
+        <button class="filter-cat-btn px-2.5 py-1 rounded border border-[#e6e2d8] bg-white font-normal hover:bg-[#f5f3ee] hover:text-[#1c2520] text-[#55635b] shrink-0 transition-all duration-150" data-cat="Books">Books ({{ items|selectattr('category', 'in', ['books', 'Books'])|list|length }})</button>
+        <button class="filter-cat-btn px-2.5 py-1 rounded border border-[#e6e2d8] bg-white font-normal hover:bg-[#f5f3ee] hover:text-[#1c2520] text-[#55635b] shrink-0 transition-all duration-150" data-cat="Keys">Keys ({{ items|selectattr('category', 'in', ['keys', 'Keys'])|list|length }})</button>
+    </div>
+
+    <!-- Scannable Engineering Data Table -->
+    <div class="bg-white border border-[#e6e2d8] rounded-lg shadow-subtle overflow-hidden">
+        <!-- Table Control Header -->
+        <div class="px-4 py-3 border-b border-[#e6e2d8] bg-[#fbfaf7] flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2">
+                <span class="font-medium text-[#1c2520]">Verified Database Entries</span>
+                <span class="px-1.5 py-0.5 rounded text-[11px] font-mono bg-[#f0ede6] text-[#55635b] border border-[#e2ddd3]" id="filtered-count-badge">{{ items|length }} entries</span>
+            </div>
+            <span class="text-[#7e8c84] font-mono text-[11px] flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#2d5a43]"></span>
+                Live Database Connected
+            </span>
+        </div>
+
+        <!-- Responsive Structured Table -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                <thead>
+                    <tr class="border-b border-[#e6e2d8] text-[#55635b] font-mono text-[11px] uppercase bg-[#f5f3ee]/60">
+                        <th class="py-2.5 px-4 font-medium w-28">Ref ID</th>
+                        <th class="py-2.5 px-4 font-medium">Item Description</th>
+                        <th class="py-2.5 px-4 font-medium hidden md:table-cell">Category</th>
+                        <th class="py-2.5 px-4 font-medium hidden sm:table-cell">Last Seen / Found Location</th>
+                        <th class="py-2.5 px-4 font-medium hidden lg:table-cell">Logged Date</th>
+                        <th class="py-2.5 px-4 font-medium">Type</th>
+                        <th class="py-2.5 px-4 font-medium">Status</th>
+                        <th class="py-2.5 px-4 font-medium text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-[#e6e2d8]" id="inventory-table-body">
+                    {% for item in items %}
+                    {% set ref_code = "REC-%03d"|format(item.id) %}
+                    {% set cat_name = cat_display.get(item.category, item.category|capitalize) if cat_display is defined else (
+                        'Electronics' if item.category == 'electronics' else
+                        ('ID Card' if item.category == 'id_card' else
+                        ('Keys' if item.category == 'keys' else
+                        ('Books' if item.category == 'books' else
+                        ('Bottle' if item.category == 'bottle' else item.category|capitalize))))
+                    ) %}
+                    <tr class="item-row hover:bg-[#f9f8f4]/90 transition-colors duration-150 group"
+                        data-id="{{ item.id }}"
+                        data-cat="{{ cat_name }}"
+                        data-date="{{ item.date_occurred.strftime('%d %b %Y') }}"
+                        data-location="{{ item.location }}"
+                        data-name="{{ item.title }}"
+                        data-ref="{{ ref_code }}"
+                        data-status="{{ item.status|capitalize }}"
+                        data-title="{{ (item.title ~ ' ' ~ item.location ~ ' ' ~ item.description)|lower }}"
+                        data-type="{{ item.item_type|upper }}"
+                        data-url="{{ url_for('item_detail', item_id=item.id) }}"
+                        data-desc="{{ item.description }}">
+                        
+                        <td class="py-3 px-4 font-mono text-xs text-[#55635b] font-medium whitespace-nowrap">
+                            <div class="relative inline-block">
+                                <button class="copy-ref-btn hover:text-[#2d5a43] flex items-center gap-1.5 transition-colors group/btn" title="Click to copy reference">
+                                    <span class="font-mono text-[#1c2520] group-hover/btn:text-[#2d5a43]">{{ ref_code }}</span>
+                                    <svg class="w-3.5 h-3.5 text-[#7e8c84] group-hover/btn:text-[#2d5a43] transition-colors" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                                <span class="copy-tooltip pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 px-1.5 py-0.5 text-[10px] font-mono bg-[#1c2520] text-white rounded opacity-0 transition-opacity duration-150 whitespace-nowrap">Copied!</span>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4">
+                            <a href="{{ url_for('item_detail', item_id=item.id) }}" class="font-medium text-[#1c2520] hover:text-[#2d5a43] transition-colors">
+                                {{ item.title }}
+                            </a>
+                            <div class="text-[11px] text-[#7e8c84] sm:hidden mt-0.5">{{ item.location }} &bull; {{ item.date_occurred.strftime('%d %b %Y') }}</div>
+                        </td>
+                        <td class="py-3 px-4 text-[#55635b] hidden md:table-cell">
+                            <span class="inline-flex items-center gap-1.5">
+                                {% if item.category == 'electronics' or cat_name == 'Electronics' %}
+                                <svg class="w-3.5 h-3.5 text-[#7e8c84]" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24"><path d="M19 5h-2a3 3 0 0 0-3 3v8a2 2 0 0 1-2 2H7"></path><path d="M4 15a3 3 0 0 0 3 3h5a4 4 0 0 0 4-4V8a1 1 0 0 1 1-1h2"></path></svg>
+                                {% elif item.category == 'id_card' or cat_name == 'ID Card' %}
+                                <svg class="w-3.5 h-3.5 text-[#7e8c84]" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24"><rect height="14" rx="2" width="18" x="3" y="5"></rect><circle cx="9" cy="11" r="2"></circle><path d="M15 9h2M15 13h2M7 16h4"></path></svg>
+                                {% elif item.category == 'bottle' or cat_name == 'Bottle' %}
+                                <svg class="w-3.5 h-3.5 text-[#7e8c84]" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24"><path d="M8 2h8v4H8zM7 6h10v14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V6z"></path></svg>
+                                {% elif item.category == 'books' or cat_name == 'Books' %}
+                                <svg class="w-3.5 h-3.5 text-[#7e8c84]" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                                {% elif item.category == 'keys' or cat_name == 'Keys' %}
+                                <svg class="w-3.5 h-3.5 text-[#7e8c84]" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"></circle><path d="m21 2-9.6 9.6M15.5 7.5l3 3"></path></svg>
+                                {% else %}
+                                <svg class="w-3.5 h-3.5 text-[#7e8c84]" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                                {% endif %}
+                                <span>{{ cat_name }}</span>
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-[#55635b] hidden sm:table-cell">{{ item.location }}</td>
+                        <td class="py-3 px-4 text-[#7e8c84] font-mono text-xs hidden lg:table-cell">{{ item.date_occurred.strftime('%d %b %Y') }}</td>
+                        <td class="py-3 px-4 whitespace-nowrap">
+                            {% if item.item_type == 'found' %}
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-mono font-medium bg-[#edf6f0] text-[#23643b] border border-[#c6e3cf]">
+                                <span class="w-1.5 h-1.5 rounded-full bg-[#23643b]"></span>
+                                FOUND
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-mono font-medium bg-[#fdf5f0] text-[#c85a32] border border-[#f5d6c8]">
+                                <span class="w-1.5 h-1.5 rounded-full bg-[#c85a32]"></span>
+                                LOST
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="py-3 px-4 whitespace-nowrap">
+                            {% if item.status == 'claimed' %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-[#f0ede6] text-[#55635b] border border-[#e2ddd3]">
+                                Claimed
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-[#edf6f0] text-[#23643b] border border-[#c6e3cf]">
+                                Open
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="py-3 px-4 text-right whitespace-nowrap">
+                            {% if item.status == 'claimed' %}
+                            <button class="view-details-btn px-2.5 py-1 rounded text-xs font-medium border border-[#e6e2d8] bg-white text-[#55635b] hover:bg-[#f5f3ee] hover:border-[#cfc9be] hover:text-[#1c2520] transition-colors duration-150" data-ref="{{ ref_code }}">
+                                View Details
+                            </button>
+                            {% elif item.item_type == 'found' %}
+                            <button class="claim-item-btn px-2.5 py-1 rounded text-xs font-medium bg-[#2d5a43] hover:bg-[#143426] text-white shadow-xs transition-all duration-150 ease-out hover:-translate-y-[1px] active:translate-y-0" data-ref="{{ ref_code }}">
+                                Claim Item
+                            </button>
+                            {% else %}
+                            <button class="report-match-btn px-2.5 py-1 rounded text-xs font-medium border border-[#e6e2d8] bg-white text-[#55635b] hover:bg-[#f5f3ee] hover:border-[#cfc9be] hover:text-[#1c2520] transition-colors duration-150" data-ref="{{ ref_code }}">
+                                Report Match
+                            </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Empty State in Table -->
+        <div class="hidden p-8 text-center bg-[#fbfaf7]" id="table-empty-state">
+            <div class="w-10 h-10 rounded-full bg-[#f0ede6] border border-[#e2ddd3] flex items-center justify-center mx-auto text-[#7e8c84] mb-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3M8 8l6 6"></path></svg>
+            </div>
+            <h3 class="text-sm font-semibold text-[#1c2520]">No items match your filter criteria</h3>
+            <p class="text-xs text-[#7e8c84] mt-1 max-w-sm mx-auto">Try clearing search keywords or choosing "All" in the category and status filters.</p>
+            <button class="mt-3 px-3 py-1.5 rounded border border-[#cfc9be] text-xs font-medium text-[#1c2520] hover:bg-white transition-colors" id="empty-reset-btn">
+                Reset Filters
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- Two-Column Operational Guidelines / Campus Logistics Section -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
+    <!-- Verification Protocol -->
+    <div class="bg-white border border-[#e6e2d8] rounded-lg p-5 shadow-subtle lg:col-span-2" id="protocol-section">
+        <div class="flex items-center gap-2 pb-3 border-b border-[#f0ede6]">
+            <svg class="w-5 h-5 text-[#2d5a43]" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke-linecap="round" stroke-linejoin="round"></path><path d="m9 12 2 2 4-4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <h2 class="text-sm font-semibold text-[#1c2520]">Campus Verification &amp; Claim Protocol</h2>
+        </div>
+        <div class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-[#55635b]">
+            <div class="p-3 bg-[#fbfaf7] rounded border border-[#e6e2d8]">
+                <div class="font-mono text-[11px] font-semibold text-[#1c2520] mb-1">01. Physical Check</div>
+                <p>Every logged item is deposited at the Central Security Desk within 2 hours of report. No unverified third-party handovers allowed.</p>
+            </div>
+            <div class="p-3 bg-[#fbfaf7] rounded border border-[#e6e2d8]">
+                <div class="font-mono text-[11px] font-semibold text-[#1c2520] mb-1">02. Identity Match</div>
+                <p>For ID cards, laptops, and wallets: Claimant must present active university ERP credentials or original student RFID ID card.</p>
+            </div>
+            <div class="p-3 bg-[#fbfaf7] rounded border border-[#e6e2d8]">
+                <div class="font-mono text-[11px] font-semibold text-[#1c2520] mb-1">03. Custody Log</div>
+                <p>Security registers the claimant's Roll Number and logs a signed custody transfer form before changing item status to "Claimed".</p>
+            </div>
+        </div>
+    </div>
+    <!-- Security Desk & Drop-off Hours -->
+    <div class="bg-white border border-[#e6e2d8] rounded-lg p-5 shadow-subtle flex flex-col justify-between" id="security-section">
+        <div>
+            <div class="flex items-center gap-2 pb-3 border-b border-[#f0ede6]">
+                <svg class="w-5 h-5 text-[#2d5a43]" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24"><path d="M12 2a4 4 0 0 0-4 4v1H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2V6a4 4 0 0 0-4-4z"></path><circle cx="12" cy="14" r="2"></circle></svg>
+                <h2 class="text-sm font-semibold text-[#1c2520]">Security Control Room</h2>
+            </div>
+            <dl class="mt-3 space-y-2 text-xs">
+                <div class="flex justify-between py-1 border-b border-[#f0ede6]">
+                    <dt class="text-[#7e8c84]">Location:</dt>
+                    <dd class="font-medium text-[#1c2520]">Block C, Ground Floor (Room 004)</dd>
+                </div>
+                <div class="flex justify-between py-1 border-b border-[#f0ede6]">
+                    <dt class="text-[#7e8c84]">Desk Hours:</dt>
+                    <dd class="font-medium text-[#1c2520]">09:00 AM – 05:30 PM (Mon-Sat)</dd>
+                </div>
+                <div class="flex justify-between py-1 border-b border-[#f0ede6]">
+                    <dt class="text-[#7e8c84]">Helpline:</dt>
+                    <dd class="font-mono text-[#1c2520]">+91 (011) 2786-EX-401</dd>
+                </div>
+                <div class="flex justify-between py-1">
+                    <dt class="text-[#7e8c84]">Emergency Ext:</dt>
+                    <dd class="font-mono font-medium text-[#23643b]">#4444 (24x7 Control)</dd>
+                </div>
+            </dl>
+        </div>
+        <div class="pt-3 mt-3 border-t border-[#f0ede6]">
+            <a class="text-xs font-medium text-[#2d5a43] hover:text-[#1b4332] flex items-center gap-1 transition-colors" href="#dropoff-section">
+                <span>View 4 campus drop-off box locations</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Campus Drop-Off Points Summary -->
+<section class="bg-white border border-[#e6e2d8] rounded-lg p-5 shadow-subtle" id="dropoff-section">
+    <h2 class="text-sm font-semibold text-[#1c2520] mb-3">Designated Campus Drop-off Boxes</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+        <div class="p-2.5 rounded border border-[#e6e2d8] bg-[#fbfaf7]">
+            <div class="font-medium text-[#1c2520]">Central Library</div>
+            <div class="text-[#55635b] mt-0.5">Ground floor lobby near turnstiles</div>
+            <div class="text-[11px] font-mono text-[#7e8c84] mt-1">Cleared daily at 5 PM</div>
+        </div>
+        <div class="p-2.5 rounded border border-[#e6e2d8] bg-[#fbfaf7]">
+            <div class="font-medium text-[#1c2520]">Main Cafeteria (Block A)</div>
+            <div class="text-[#55635b] mt-0.5">Beside billing counter exit</div>
+            <div class="text-[11px] font-mono text-[#7e8c84] mt-1">Cleared twice daily</div>
+        </div>
+        <div class="p-2.5 rounded border border-[#e6e2d8] bg-[#fbfaf7]">
+            <div class="font-medium text-[#1c2520]">Sports Complex</div>
+            <div class="text-[#55635b] mt-0.5">Equipment counter front desk</div>
+            <div class="text-[11px] font-mono text-[#7e8c84] mt-1">Cleared daily at 7 PM</div>
+        </div>
+        <div class="p-2.5 rounded border border-[#e6e2d8] bg-[#fbfaf7]">
+            <div class="font-medium text-[#1c2520]">CS &amp; IT Dept (Block B)</div>
+            <div class="text-[#55635b] mt-0.5">Staff lounge reception</div>
+            <div class="text-[11px] font-mono text-[#7e8c84] mt-1">Direct officer dispatch</div>
+        </div>
+    </div>
+</section>
+
+<!-- Report Item Modal -->
+<div class="hidden fixed inset-0 z-50 overflow-y-auto bg-[#1c2520]/45 backdrop-blur-xs flex items-center justify-center p-4" id="report-modal">
+    <div class="bg-white border border-[#e6e2d8] rounded-lg shadow-xl max-w-lg w-full p-6 text-[#1c2520] relative my-8">
+        <div class="flex items-start justify-between pb-3 border-b border-[#e6e2d8]">
+            <div>
+                <h2 class="text-base font-semibold text-[#1c2520]">Report an Item</h2>
+                <p class="text-xs text-[#7e8c84] mt-0.5">Submit details to append an entry to the verified campus registry.</p>
+            </div>
+            <button class="text-[#7e8c84] hover:text-[#1c2520] p-1 transition-colors" id="close-report-modal">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" stroke-linecap="round"></path></svg>
+            </button>
+        </div>
+        <form class="mt-4 space-y-3.5 text-xs" id="report-item-form" action="{{ url_for('report') }}" method="POST" enctype="multipart/form-data">
+            <div>
+                <label class="block font-medium text-[#1c2520] mb-1">Report Type *</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <label class="flex items-center gap-2 p-2 rounded border border-[#e6e2d8] bg-[#fbfaf7] cursor-pointer hover:bg-white transition-colors">
+                        <input checked="" class="text-[#2d5a43] focus:ring-[#2d5a43]" name="item_type" type="radio" value="found"/>
+                        <span class="font-medium text-[#1c2520]">I found an item</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-2 rounded border border-[#e6e2d8] bg-[#fbfaf7] cursor-pointer hover:bg-white transition-colors">
+                        <input class="text-[#2d5a43] focus:ring-[#2d5a43]" name="item_type" type="radio" value="lost"/>
+                        <span class="font-medium text-[#1c2520]">I lost an item</span>
+                    </label>
+                </div>
+            </div>
+            <div>
+                <label class="block font-medium text-[#1c2520] mb-1" for="report-title">Item Title / Model *</label>
+                <input class="w-full px-3 py-2 text-xs rounded border border-[#e6e2d8] focus:ring-1 focus:ring-[#2d5a43] focus:border-[#2d5a43]" id="report-title" name="title" placeholder="e.g., Casio FX-991CW Calculator, Red Lanyard" required="" type="text"/>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block font-medium text-[#1c2520] mb-1" for="report-category">Category *</label>
+                    <select class="w-full px-3 py-2 text-xs rounded border border-[#e6e2d8] focus:ring-1 focus:ring-[#2d5a43] focus:border-[#2d5a43] bg-white" id="report-category" name="category" required>
+                        <option value="electronics">Electronics</option>
+                        <option value="id_card">ID Card / Wallet</option>
+                        <option value="keys">Keys</option>
+                        <option value="bottle">Bottle</option>
+                        <option value="books">Books / Notes</option>
+                        <option value="clothing">Clothing / Bag</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-medium text-[#1c2520] mb-1" for="report-location">Location Discovered / Lost *</label>
+                    <input class="w-full px-3 py-2 text-xs rounded border border-[#e6e2d8] focus:ring-1 focus:ring-[#2d5a43] focus:border-[#2d5a43]" id="report-location" name="location" placeholder="e.g. CR-204, Library 1st Floor" required="" type="text"/>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block font-medium text-[#1c2520] mb-1" for="report-date">Date Lost / Found *</label>
+                    <input class="w-full px-3 py-2 text-xs rounded border border-[#e6e2d8] focus:ring-1 focus:ring-[#2d5a43] focus:border-[#2d5a43]" id="report-date" name="date_occurred" required="" type="date"/>
+                </div>
+                <div>
+                    <label class="block font-medium text-[#1c2520] mb-1" for="report-contact">Campus Email / Contact *</label>
+                    <input class="w-full px-3 py-2 text-xs rounded border border-[#e6e2d8] focus:ring-1 focus:ring-[#2d5a43] focus:border-[#2d5a43]" id="report-contact" name="contact_email" placeholder="e.g., student@campus.edu" required="" type="email"/>
+                </div>
+            </div>
+            <div>
+                <label class="block font-medium text-[#1c2520] mb-1" for="report-desc">Identifying Marks &amp; Description *</label>
+                <textarea class="w-full px-3 py-2 text-xs rounded border border-[#e6e2d8] focus:ring-1 focus:ring-[#2d5a43] focus:border-[#2d5a43]" id="report-desc" name="description" placeholder="Color, distinguishing scratches, brand, keychains, etc." required="" rows="2"></textarea>
+            </div>
+            <div>
+                <label class="block font-medium text-[#1c2520] mb-1" for="report-photo">Photo Attachment (Optional)</label>
+                <input class="w-full px-3 py-1.5 text-xs rounded border border-[#e6e2d8] bg-[#fbfaf7] file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-medium file:bg-[#2d5a43] file:text-white hover:file:bg-[#143426] cursor-pointer" id="report-photo" name="photo" accept="image/png, image/jpeg" type="file"/>
+            </div>
+            <div class="pt-2 flex items-center justify-end gap-2 border-t border-[#e6e2d8]">
+                <button class="px-3 py-1.5 rounded border border-[#e6e2d8] text-[#55635b] hover:bg-[#f5f3ee] font-medium transition-colors" id="cancel-report-modal" type="button">
+                    Cancel
+                </button>
+                <button class="px-3.5 py-1.5 rounded bg-[#2d5a43] hover:bg-[#143426] text-white font-medium shadow-xs transition-all duration-150 ease-out hover:-translate-y-[1px]" type="submit">
+                    Submit Entry
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Item Details Drawer Modal -->
+<div class="hidden fixed inset-0 z-50 overflow-y-auto bg-[#1c2520]/45 backdrop-blur-xs flex items-center justify-center p-4" id="details-modal">
+    <div class="bg-white border border-[#e6e2d8] rounded-lg shadow-xl max-w-md w-full p-6 text-[#1c2520] relative my-8">
+        <div class="flex items-start justify-between pb-3 border-b border-[#e6e2d8]">
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="px-1.5 py-0.5 rounded font-mono text-[11px] bg-[#f0ede6] text-[#55635b] border border-[#e2ddd3]" id="modal-ref-tag">REC-000</span>
+                    <span class="px-2 py-0.5 rounded font-mono text-[11px] font-medium bg-[#edf6f0] text-[#23643b] border border-[#c6e3cf]" id="modal-type-badge">FOUND</span>
+                </div>
+                <h2 class="text-base font-semibold text-[#1c2520] mt-1" id="modal-item-name">Item Details</h2>
+            </div>
+            <button class="text-[#7e8c84] hover:text-[#1c2520] p-1 transition-colors" id="close-details-modal">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" stroke-linecap="round"></path></svg>
+            </button>
+        </div>
+        <div class="mt-4 space-y-2.5 text-xs text-[#55635b]">
+            <div class="flex justify-between py-1.5 border-b border-[#f0ede6]">
+                <span class="text-[#7e8c84]">Category:</span>
+                <span class="font-medium text-[#1c2520]" id="modal-category">-</span>
+            </div>
+            <div class="flex justify-between py-1.5 border-b border-[#f0ede6]">
+                <span class="text-[#7e8c84]">Location Reported:</span>
+                <span class="font-medium text-[#1c2520]" id="modal-location">-</span>
+            </div>
+            <div class="flex justify-between py-1.5 border-b border-[#f0ede6]">
+                <span class="text-[#7e8c84]">Date Logged:</span>
+                <span class="font-mono text-[#1c2520]" id="modal-date">-</span>
+            </div>
+            <div class="flex justify-between py-1.5 border-b border-[#f0ede6]">
+                <span class="text-[#7e8c84]">Current Status:</span>
+                <span class="font-medium text-[#1c2520]" id="modal-status">-</span>
+            </div>
+            <div>
+                <span class="text-[#7e8c84] block mb-1">Description / Notes:</span>
+                <p class="p-2.5 bg-[#fbfaf7] rounded border border-[#e6e2d8] text-[#1c2520] text-xs leading-relaxed whitespace-pre-line" id="modal-desc">-</p>
+            </div>
+            <div class="p-3 bg-[#fbfaf7] rounded border border-[#e6e2d8] mt-2">
+                <span class="font-semibold text-[#1c2520] block mb-1">Custody Location</span>
+                <p>Campus Security Desk, Block C (Ground Floor). Present your college ID card and quote Reference ID <strong class="font-mono text-[#2d5a43]" id="modal-copy-ref"></strong> to collect or file evidence.</p>
+            </div>
+        </div>
+        <div class="pt-4 mt-4 flex items-center justify-between gap-2 border-t border-[#e6e2d8]">
+            <a href="#" id="modal-permalink" class="text-xs font-medium text-[#2d5a43] hover:underline flex items-center gap-1">
+                <span>View Full Page</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <div class="flex items-center gap-2">
+                <button class="px-3 py-1.5 rounded border border-[#e6e2d8] text-[#55635b] hover:bg-[#f5f3ee] font-medium transition-colors text-xs" id="dismiss-details-modal" type="button">
+                    Close
+                </button>
+                <button class="px-3.5 py-1.5 rounded bg-[#2d5a43] hover:bg-[#143426] text-white font-medium shadow-xs transition-all duration-150 ease-out hover:-translate-y-[1px] text-xs" id="modal-action-btn" type="button">
+                    Claim Item
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

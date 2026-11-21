@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% block title %}{{ item.title }} — Campus Findr Registry{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto w-full">
+    <!-- Breadcrumb / Back Navigation -->
+    <a href="{{ url_for('index') }}" class="inline-flex items-center gap-1.5 text-xs text-[#55635b] hover:text-[#1c2520] mb-4 transition group">
+        <svg class="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+        </svg>
+        <span>Back to Registry Directory</span>
+    </a>
+
+    <!-- Detail Container Card -->
+    <div class="bg-white border border-[#e6e2d8] rounded-lg shadow-subtle overflow-hidden animate-reveal-1">
+        
+        <!-- Header Strip -->
+        <div class="p-5 sm:p-6 border-b border-[#e6e2d8] bg-[#fbfaf7] flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+                <span class="font-mono text-xs px-2 py-0.5 rounded bg-[#f0ede6] text-[#55635b] border border-[#e2ddd3] font-medium">
+                    REC-{{ "%03d"|format(item.id) }}
+                </span>
+                {% if item.item_type == 'found' %}
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[11px] font-mono font-medium bg-[#edf6f0] text-[#23643b] border border-[#c6e3cf]">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#23643b]"></span>
+                    FOUND PROPERTY
+                </span>
+                {% else %}
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[11px] font-mono font-medium bg-[#fdf5f0] text-[#c85a32] border border-[#f5d6c8]">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#c85a32]"></span>
+                    LOST PROPERTY
+                </span>
+                {% endif %}
+                {% if item.status == 'claimed' %}
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-[#f0ede6] text-[#55635b] border border-[#e2ddd3]">
+                    Case Resolved / Claimed
+                </span>
+                {% else %}
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-[#edf6f0] text-[#23643b] border border-[#c6e3cf]">
+                    Active / Open
+                </span>
+                {% endif %}
+            </div>
+            <span class="font-mono text-xs text-[#7e8c84]">Logged: {{ item.date_reported.strftime('%d %b %Y, %H:%M') }}</span>
+        </div>
+
+        <!-- Attached Image (if available) -->
+        {% if item.photo_filename %}
+        <div class="border-b border-[#e6e2d8] bg-[#f5f3ee] flex items-center justify-center p-4">
+            <img src="{{ url_for('static', filename='uploads/' ~ item.photo_filename) }}"
+                 alt="{{ item.title }}"
+                 class="max-h-80 w-auto rounded border border-[#e6e2d8] object-contain shadow-xs">
+        </div>
+        {% endif %}
+
+        <!-- Body Details -->
+        <div class="p-6 sm:p-7 space-y-6">
+            <!-- Title -->
+            <div>
+                <h1 class="text-xl sm:text-2xl font-semibold text-[#1c2520] tracking-tight">{{ item.title }}</h1>
+                <p class="text-xs text-[#7e8c84] mt-1 font-mono">Category: {{ item.category|capitalize }}</p>
+            </div>
+
+            <!-- Structured Metadata Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div class="p-3.5 bg-[#fbfaf7] rounded border border-[#e6e2d8]">
+                    <span class="text-[#7e8c84] block font-mono text-[11px] uppercase tracking-wider mb-0.5">Location Reported</span>
+                    <span class="font-medium text-[#1c2520] text-sm">{{ item.location }}</span>
+                </div>
+                <div class="p-3.5 bg-[#fbfaf7] rounded border border-[#e6e2d8]">
+                    <span class="text-[#7e8c84] block font-mono text-[11px] uppercase tracking-wider mb-0.5">Date Occurred</span>
+                    <span class="font-medium text-[#1c2520] text-sm font-mono">{{ item.date_occurred.strftime('%d %b %Y') }}</span>
+                </div>
+                {% if item.deposit_location %}
+                <div class="p-3.5 bg-[#fbfaf7] rounded border border-[#e6e2d8] sm:col-span-2">
+                    <span class="text-[#7e8c84] block font-mono text-[11px] uppercase tracking-wider mb-0.5">Custody Handover Location</span>
+                    <span class="font-medium text-[#1c2520] text-sm">{{ item.deposit_location }}</span>
+                </div>
+                {% endif %}
+                <div class="p-3.5 bg-[#fbfaf7] rounded border border-[#e6e2d8] sm:col-span-2">
+                    <span class="text-[#7e8c84] block font-mono text-[11px] uppercase tracking-wider mb-0.5">Contact Coordinates</span>
+                    <span class="font-mono text-[#1c2520] text-xs">{{ item.contact_email }}</span>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div>
+                <h2 class="text-xs font-mono uppercase tracking-wider text-[#7e8c84] mb-1.5">Description &amp; Identifying Marks</h2>
+                <div class="p-3.5 bg-[#fbfaf7] rounded border border-[#e6e2d8] text-xs text-[#1c2520] leading-relaxed whitespace-pre-line">
+                    {{ item.description }}
+                </div>
+            </div>
+
+            <!-- Existing Claim Information (if submitted) -->
+            {% if item.claim_detail %}
+            <div class="p-4 bg-[#edf6f0] border border-[#c6e3cf] rounded-md text-xs space-y-1.5">
+                <div class="flex items-center gap-2 text-[#23643b] font-semibold">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span>Claim Verification Telemetry Logged</span>
+                </div>
+                <p class="text-[#1c2520]"><strong>Claimant Email:</strong> <span class="font-mono">{{ item.claimed_by_email }}</span></p>
+                <p class="text-[#1c2520]"><strong>Verification Evidence:</strong> {{ item.claim_detail }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Custody Protocol Card -->
+            <div class="p-3.5 bg-[#fdf8ed] border border-[#e8cfa1] rounded-md text-xs text-[#8c5b08] flex items-start gap-2.5">
+                <svg class="w-4 h-4 text-[#b87c12] shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4m0-4h.01" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                <p>
+                    <strong>Campus Verification Policy:</strong> Physical collection must be conducted at the Central Security Desk (Block C, Room 004). You must quote Reference ID <strong class="font-mono text-[#6f4504]">REC-{{ "%03d"|format(item.id) }}</strong> and produce a valid student/faculty ID card.
+                </p>
+            </div>
+
+            <!-- Actions Bar -->
+            <div class="pt-4 border-t border-[#e6e2d8] flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                    {% if item.status == 'open' and not item.claim_detail %}
+                    <button type="button" id="claimToggle"
+                            class="px-4 py-2 rounded-md bg-[#2d5a43] hover:bg-[#143426] text-white text-xs font-medium shadow-subtle transition-all duration-150 ease-out hover:-translate-y-[1px]">
+                        {% if item.item_type == 'found' %}Claim This Item{% else %}Report Matching Item{% endif %}
+                    </button>
+                    {% endif %}
+
+                    {% if item.status == 'open' and item.claim_detail %}
+                    <form action="{{ url_for('resolve_item', item_id=item.id) }}" method="POST">
+                        <button type="submit"
+                                class="px-4 py-2 rounded-md bg-[#2d5a43] hover:bg-[#143426] text-white text-xs font-medium shadow-subtle transition-all duration-150">
+                            Mark Case as Resolved
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+
+                <form action="{{ url_for('admin_delete', item_id=item.id) }}" method="POST"
+                      onsubmit="return confirm('Are you sure you want to remove this record from the campus registry?');">
+                    <button type="submit"
+                            class="px-3 py-1.5 rounded border border-[#f5d6c8] text-[#c85a32] hover:bg-[#fdf5f0] text-xs font-medium transition-colors">
+                        Delete Record
+                    </button>
+                </form>
+            </div>
+
+            <!-- Collapsible Claim Form -->
+            {% if item.status == 'open' and not item.claim_detail %}
+            <div id="claimSection" class="hidden mt-4 pt-4 border-t border-[#e6e2d8]">
+                <form action="{{ url_for('claim_item', item_id=item.id) }}" method="POST"
+                      class="bg-[#fbfaf7] border border-[#e6e2d8] rounded-lg p-5 space-y-3.5 text-xs">
+                    <div class="border-b border-[#e6e2d8] pb-2">
+                        <h3 class="font-semibold text-xs text-[#1c2520]">File Verification Evidence</h3>
+                        <p class="text-[11px] text-[#7e8c84] mt-0.5">Provide proof of ownership that matches undisclosed characteristics.</p>
+                    </div>
+
+                    <div>
+                        <label for="claimed_by_email" class="block font-medium text-[#1c2520] mb-1">Your University Email *</label>
+                        <input type="email" name="claimed_by_email" id="claimed_by_email" required
+                               placeholder="yourname@college.edu"
+                               class="w-full px-3 py-2 text-xs rounded border border-[#e6e2d8] focus:ring-1 focus:ring-[#2d5a43] focus:border-[#2d5a43] bg-white">
+                    </div>
+
+                    <div>
+                        <label for="claim_detail" class="block font-medium text-[#1c2520] mb-1">Verification Details / Serial / Passcode / Markers *</label>
+                        <textarea name="claim_detail" id="claim_detail" required rows="3"
+                                  placeholder="Describe details only the genuine owner would know (e.g. wallpaper, specific scratches, contents, serial number)..."
+                                  class="w-full px-3 py-2 text-xs rounded border border-[#e6e2d8] focus:ring-1 focus:ring-[#2d5a43] focus:border-[#2d5a43] bg-white resize-y"></textarea>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2 pt-1">
+                        <button type="button" onclick="document.getElementById('claimSection').classList.add('hidden')"
+                                class="px-3 py-1.5 rounded border border-[#e6e2d8] text-[#55635b] hover:bg-white transition-colors">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                                class="px-3.5 py-1.5 rounded bg-[#2d5a43] hover:bg-[#143426] text-white font-medium shadow-xs transition-all duration-150">
+                            Submit Verification Claim
+                        </button>
+                    </div>
+                </form>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}
