@@ -1,6 +1,6 @@
 #Task 1 — Name, Department, College
 print()
-print("Name: Ansh Singh")
+print("Name: JASASWINI SAHU")
 print("Department: CSE - AIDE")
 print("College: Jain University")
 
@@ -45,7 +45,7 @@ print("Welcome")
 print("Python is easy")
 
 
-name = "\Ansh Singh"
+name = "\JASASWINI SAHU"
 print(name)
 a = 10
 b = 20
