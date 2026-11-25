@@ -1,317 +1,173 @@
-{
- "cells": [
-  {
-   "cell_type": "markdown",
-   "id": "d76f1043",
-   "metadata": {},
-   "source": [
-    "LAB EXPERIMENT PART-4\n",
-    "\n",
-    "NAME:JASASWINI SAHU\n",
-    "\n",
-    "USN:25BRAD043"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "id": "625c838c",
-   "metadata": {},
-   "source": [
-    "Lab Exercise 11 — Log File Reader Program\n",
-    "\n",
-    "Question:\n",
-    "\n",
-    "Develop a Python program to read a log file, identify specific keywords such as ERROR, WARNING, and INFO, and summarize the number of occurrences of each category.\n",
-    "\n",
-    "CODE:"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 8,
-   "id": "a414d5f8",
-   "metadata": {},
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "Log Summary\n",
-      "ERROR: 2\n",
-      "WARNING: 2\n",
-      "INFO: 4\n"
-     ]
-    }
-   ],
-   "source": [
-    "import re\n",
-    "from pathlib import Path\n",
-    "\n",
-    "# Search the notebook folder and project folders in Jupyter.\n",
-    "possible_paths = [\n",
-    "    Path.cwd() / \"app.log\",\n",
-    "    Path.cwd() / \"25BTRAD043_Lab_Exercises\" / \"app.log\",\n",
-    "]\n",
-    "\n",
-    "log_file = next(\n",
-    "    (path for path in possible_paths if path.exists()),\n",
-    "    None,\n",
-    ")\n",
-    "\n",
-    "if log_file is None:\n",
-    "    matches = list(Path.cwd().rglob(\"app.log\"))\n",
-    "    log_file = matches[0] if matches else None\n",
-    "\n",
-    "counts = {\"ERROR\": 0, \"WARNING\": 0, \"INFO\": 0}\n",
-    "\n",
-    "if log_file is None:\n",
-    "    print(\"Log file not found. Save app.log beside lab_exercise_4.ipynb.\")\n",
-    "else:\n",
-    "    try:\n",
-    "        with open(log_file, \"r\", encoding=\"utf-8\") as file:\n",
-    "            content = file.read()\n",
-    "\n",
-    "        if not content.strip():\n",
-    "            print(\"The log file is empty.\")\n",
-    "        else:\n",
-    "            keywords = re.findall(r\"\\b(ERROR|WARNING|INFO)\\b\", content)\n",
-    "            for keyword in keywords:\n",
-    "                counts[keyword] += 1\n",
-    "\n",
-    "            print(\"Log Summary\")\n",
-    "            for keyword, count in counts.items():\n",
-    "                print(f\"{keyword}: {count}\")\n",
-    "\n",
-    "    except FileNotFoundError:\n",
-    "        print(\"Log file not found. Save app.log beside lab_exercise_4.ipynb.\")"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "id": "e361f290",
-   "metadata": {},
-   "source": [
-    "Lab Exercise 12 — Student Data Manager Using Files\n",
-    "\n",
-    "Question:\n",
-    "\n",
-    "Develop a Python program to store, retrieve, search, update, and display student records using file operations.\n",
-    "\n",
-    "CODE:"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 9,
-   "id": "a8eb2b25",
-   "metadata": {},
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "\n",
-      "1. Add  2. Search  3. Update  4. Display  5. Exit\n",
-      "This USN already exists.\n",
-      "\n",
-      "1. Add  2. Search  3. Update  4. Display  5. Exit\n",
-      "USN | Name | Marks\n",
-      "25BTRAD043 | jasaswini sahu | 100/100\n",
-      "\n",
-      "1. Add  2. Search  3. Update  4. Display  5. Exit\n",
-      "Program closed.\n"
-     ]
-    }
-   ],
-   "source": [
-    "import json\n",
-    "from pathlib import Path\n",
-    "\n",
-    "base_dir = Path(__file__).resolve().parent if \"__file__\" in globals() else Path.cwd()\n",
-    "data_file = base_dir / \"students.json\"\n",
-    "\n",
-    "try:\n",
-    "    with open(data_file, \"r\", encoding=\"utf-8\") as file:\n",
-    "        students = json.load(file)\n",
-    "except FileNotFoundError:\n",
-    "    students = {}\n",
-    "\n",
-    "\n",
-    "def show_student(usn, student):\n",
-    "    print(f\"{usn} | {student['name']} | {student['marks']}/100\")\n",
-    "\n",
-    "\n",
-    "while True:\n",
-    "    print(\"\\n1. Add  2. Search  3. Update  4. Display  5. Exit\")\n",
-    "    choice = input(\"Enter choice: \").strip()\n",
-    "\n",
-    "    if choice == \"5\":\n",
-    "        print(\"Program closed.\")\n",
-    "        break\n",
-    "\n",
-    "    if choice == \"4\":\n",
-    "        if not students:\n",
-    "            print(\"No student records found.\")\n",
-    "        else:\n",
-    "            print(\"USN | Name | Marks\")\n",
-    "            for usn, student in students.items():\n",
-    "                show_student(usn, student)\n",
-    "        continue\n",
-    "\n",
-    "    if choice not in (\"1\", \"2\", \"3\"):\n",
-    "        print(\"Invalid choice.\")\n",
-    "        continue\n",
-    "\n",
-    "    usn = input(\"Enter USN: \").strip().upper()\n",
-    "    if not usn:\n",
-    "        print(\"USN cannot be empty.\")\n",
-    "        continue\n",
-    "\n",
-    "    if choice == \"1\" and usn in students:\n",
-    "        print(\"This USN already exists.\")\n",
-    "        continue\n",
-    "\n",
-    "    if choice in (\"2\", \"3\") and usn not in students:\n",
-    "        print(\"Student not found.\")\n",
-    "        continue\n",
-    "\n",
-    "    if choice == \"2\":\n",
-    "        show_student(usn, students[usn])\n",
-    "        continue\n",
-    "\n",
-    "    name = input(\"Enter name: \").strip()\n",
-    "    if not name:\n",
-    "        print(\"Name cannot be empty.\")\n",
-    "        continue\n",
-    "\n",
-    "    try:\n",
-    "        marks = int(input(\"Enter marks out of 100: \"))\n",
-    "    except ValueError:\n",
-    "        print(\"Marks must be a whole number.\")\n",
-    "        continue\n",
-    "\n",
-    "    if not 0 <= marks <= 100:\n",
-    "        print(\"Marks must be between 0 and 100.\")\n",
-    "        continue\n",
-    "\n",
-    "    students[usn] = {\"name\": name, \"marks\": marks}\n",
-    "\n",
-    "    with open(data_file, \"w\", encoding=\"utf-8\") as file:\n",
-    "        json.dump(students, file, indent=4)\n",
-    "\n",
-    "    if choice == \"1\":\n",
-    "        print(\"Student added.\")\n",
-    "    else:\n",
-    "        print(\"Student updated.\")"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "id": "de1cf03f",
-   "metadata": {},
-   "source": [
-    "Lab Exercise 13 — CSV-Based Payroll Management System\n",
-    "\n",
-    "Question:\n",
-    "\n",
-    "Develop a Python program to read employee records from a CSV file, calculate gross salary and applicable deductions, and generate salary summaries.\n",
-    "\n",
-    "CODE:"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 10,
-   "id": "d1755b8f",
-   "metadata": {},
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "Salary Summary (INR)\n",
-      "EMP001 | Jasaswini Sahu | Gross: 55000.00 | Deduction: 5500.00 | Net: 49500.00\n",
-      "EMP002 | Rahul Sharma | Gross: 67500.00 | Deduction: 8437.50 | Net: 59062.50\n",
-      "EMP003 | Ananya Patel | Gross: 49000.00 | Deduction: 3920.00 | Net: 45080.00\n",
-      "EMP004 | Arjun Kumar | Gross: 61000.00 | Deduction: 7015.00 | Net: 53985.00\n"
-     ]
-    }
-   ],
-   "source": [
-    "import csv\n",
-    "from decimal import Decimal, InvalidOperation, ROUND_HALF_UP\n",
-    "from pathlib import Path\n",
-    "\n",
-    "base_dir = Path(__file__).resolve().parent if \"__file__\" in globals() else Path.cwd()\n",
-    "csv_file = base_dir / \"employees.csv\"\n",
-    "required_columns = {\n",
-    "    \"employee_id\", \"name\", \"basic_salary\", \"allowance\", \"deduction_percent\"\n",
-    "}\n",
-    "paise = Decimal(\"0.01\")\n",
-    "\n",
-    "try:\n",
-    "    with open(csv_file, \"r\", newline=\"\", encoding=\"utf-8\") as file:\n",
-    "        employees = csv.DictReader(file)\n",
-    "\n",
-    "        if not required_columns.issubset(employees.fieldnames or []):\n",
-    "            print(\"The CSV file is missing required columns.\")\n",
-    "        else:\n",
-    "            print(\"Salary Summary (INR)\")\n",
-    "\n",
-    "            for row_number, employee in enumerate(employees, start=2):\n",
-    "                try:\n",
-    "                    employee_id = (employee[\"employee_id\"] or \"\").strip()\n",
-    "                    name = (employee[\"name\"] or \"\").strip()\n",
-    "                    basic = Decimal(employee[\"basic_salary\"] or \"\")\n",
-    "                    allowance = Decimal(employee[\"allowance\"] or \"\")\n",
-    "                    rate = Decimal(employee[\"deduction_percent\"] or \"\")\n",
-    "\n",
-    "                    if not all(value.is_finite()\n",
-    "                               for value in (basic, allowance, rate)):\n",
-    "                        raise ValueError\n",
-    "\n",
-    "                    if (not employee_id or not name or basic < 0\n",
-    "                            or allowance < 0 or not 0 <= rate <= 100):\n",
-    "                        raise ValueError\n",
-    "\n",
-    "                    gross = (basic + allowance).quantize(\n",
-    "                        paise, rounding=ROUND_HALF_UP\n",
-    "                    )\n",
-    "                    deduction = (gross * rate / 100).quantize(\n",
-    "                        paise, rounding=ROUND_HALF_UP\n",
-    "                    )\n",
-    "                    net = gross - deduction\n",
-    "\n",
-    "                    print(f\"{employee_id} | {name} | Gross: {gross:.2f} | \"\n",
-    "                          f\"Deduction: {deduction:.2f} | Net: {net:.2f}\")\n",
-    "\n",
-    "                except (InvalidOperation, ValueError):\n",
-    "                    print(f\"Row {row_number} skipped because of invalid data.\")\n",
-    "\n",
-    "except FileNotFoundError:\n",
-    "    print(\"CSV file not found. Save employees.csv next to the notebook.\")"
-   ]
-  }
- ],
- "metadata": {
-  "kernelspec": {
-   "display_name": ".venv (3.9.6)",
-   "language": "python",
-   "name": "python3"
-  },
-  "language_info": {
-   "codemirror_mode": {
-    "name": "ipython",
-    "version": 3
-   },
-   "file_extension": ".py",
-   "mimetype": "text/x-python",
-   "name": "python",
-   "nbconvert_exporter": "python",
-   "pygments_lexer": "ipython3",
-   "version": "3.9.6"
-  }
- },
- "nbformat": 4,
- "nbformat_minor": 5
+import re
+from pathlib import Path
+
+                                                            
+possible_paths = [
+    Path.cwd() / "app.log",
+    Path.cwd() / "25BTRAD043_Lab_Exercises" / "app.log",
+]
+
+log_file = next(
+    (path for path in possible_paths if path.exists()),
+    None,
+)
+
+if log_file is None:
+    matches = list(Path.cwd().rglob("app.log"))
+    log_file = matches[0] if matches else None
+
+counts = {"ERROR": 0, "WARNING": 0, "INFO": 0}
+
+if log_file is None:
+    print("Log file not found. Save app.log beside lab_exercise_4.ipynb.")
+else:
+    try:
+        with open(log_file, "r", encoding="utf-8") as file:
+            content = file.read()
+
+        if not content.strip():
+            print("The log file is empty.")
+        else:
+            keywords = re.findall(r"\b(ERROR|WARNING|INFO)\b", content)
+            for keyword in keywords:
+                counts[keyword] += 1
+
+            print("Log Summary")
+            for keyword, count in counts.items():
+                print(f"{keyword}: {count}")
+
+    except FileNotFoundError:
+        print("Log file not found. Save app.log beside lab_exercise_4.ipynb.")
+
+import json
+from pathlib import Path
+
+base_dir = Path(__file__).resolve().parent if "__file__" in globals() else Path.cwd()
+data_file = base_dir / "students.json"
+
+try:
+    with open(data_file, "r", encoding="utf-8") as file:
+        students = json.load(file)
+except FileNotFoundError:
+    students = {}
+
+
+def show_student(usn, student):
+    print(f"{usn} | {student['name']} | {student['marks']}/100")
+
+
+while True:
+    print("\n1. Add  2. Search  3. Update  4. Display  5. Exit")
+    choice = input("Enter choice: ").strip()
+
+    if choice == "5":
+        print("Program closed.")
+        break
+
+    if choice == "4":
+        if not students:
+            print("No student records found.")
+        else:
+            print("USN | Name | Marks")
+            for usn, student in students.items():
+                show_student(usn, student)
+        continue
+
+    if choice not in ("1", "2", "3"):
+        print("Invalid choice.")
+        continue
+
+    usn = input("Enter USN: ").strip().upper()
+    if not usn:
+        print("USN cannot be empty.")
+        continue
+
+    if choice == "1" and usn in students:
+        print("This USN already exists.")
+        continue
+
+    if choice in ("2", "3") and usn not in students:
+        print("Student not found.")
+        continue
+
+    if choice == "2":
+        show_student(usn, students[usn])
+        continue
+
+    name = input("Enter name: ").strip()
+    if not name:
+        print("Name cannot be empty.")
+        continue
+
+    try:
+        marks = int(input("Enter marks out of 100: "))
+    except ValueError:
+        print("Marks must be a whole number.")
+        continue
+
+    if not 0 <= marks <= 100:
+        print("Marks must be between 0 and 100.")
+        continue
+
+    students[usn] = {"name": name, "marks": marks}
+
+    with open(data_file, "w", encoding="utf-8") as file:
+        json.dump(students, file, indent=4)
+
+    if choice == "1":
+        print("Student added.")
+    else:
+        print("Student updated.")
+
+import csv
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+from pathlib import Path
+
+base_dir = Path(__file__).resolve().parent if "__file__" in globals() else Path.cwd()
+csv_file = base_dir / "employees.csv"
+required_columns = {
+    "employee_id", "name", "basic_salary", "allowance", "deduction_percent"
 }
+paise = Decimal("0.01")
+
+try:
+    with open(csv_file, "r", newline="", encoding="utf-8") as file:
+        employees = csv.DictReader(file)
+
+        if not required_columns.issubset(employees.fieldnames or []):
+            print("The CSV file is missing required columns.")
+        else:
+            print("Salary Summary (INR)")
+
+            for row_number, employee in enumerate(employees, start=2):
+                try:
+                    employee_id = (employee["employee_id"] or "").strip()
+                    name = (employee["name"] or "").strip()
+                    basic = Decimal(employee["basic_salary"] or "")
+                    allowance = Decimal(employee["allowance"] or "")
+                    rate = Decimal(employee["deduction_percent"] or "")
+
+                    if not all(value.is_finite()
+                               for value in (basic, allowance, rate)):
+                        raise ValueError
+
+                    if (not employee_id or not name or basic < 0
+                            or allowance < 0 or not 0 <= rate <= 100):
+                        raise ValueError
+
+                    gross = (basic + allowance).quantize(
+                        paise, rounding=ROUND_HALF_UP
+                    )
+                    deduction = (gross * rate / 100).quantize(
+                        paise, rounding=ROUND_HALF_UP
+                    )
+                    net = gross - deduction
+
+                    print(f"{employee_id} | {name} | Gross: {gross:.2f} | "
+                          f"Deduction: {deduction:.2f} | Net: {net:.2f}")
+
+                except (InvalidOperation, ValueError):
+                    print(f"Row {row_number} skipped because of invalid data.")
+
+except FileNotFoundError:
+    print("CSV file not found. Save employees.csv next to the notebook.")

@@ -1,268 +1,145 @@
-{
- "cells": [
-  {
-   "cell_type": "markdown",
-   "id": "3c1e7d35",
-   "metadata": {},
-   "source": [
-    "NAME:JASASWINI SAHU\n",
-    "\n",
-    "USN:25BTRAD043\n",
-    "\n",
-    "Problem solving component mini project part 3"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "id": "0fefaf34",
-   "metadata": {},
-   "source": [
-    "Mini Project 1 — Attendance Tracker\n",
-    "\n",
-    "Question:\n",
-    "\n",
-    "Develop a Python-based attendance tracker for a class using lists and dictionaries. The application should store student names and attendance status, allow attendance records to be added or updated, display attendance details, and calculate each student's attendance percentage.\n",
-    "\n",
-    "CODE:"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 1,
-   "id": "f6d1a105",
-   "metadata": {},
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "\n",
-      "1. Add student  2. Mark or update attendance\n",
-      "3. Display attendance  4. Exit\n",
-      "Student added.\n",
-      "\n",
-      "1. Add student  2. Mark or update attendance\n",
-      "3. Display attendance  4. Exit\n",
-      "\n",
-      "Attendance Report (minimum 75%)\n",
-      "Jasaswini | No attendance recorded\n",
-      "\n",
-      "1. Add student  2. Mark or update attendance\n",
-      "3. Display attendance  4. Exit\n",
-      "Program closed.\n"
-     ]
-    }
-   ],
-   "source": [
-    "students = {}\n",
-    "threshold = 75\n",
-    "\n",
-    "while True:\n",
-    "    print(\"\\n1. Add student  2. Mark or update attendance\")\n",
-    "    print(\"3. Display attendance  4. Exit\")\n",
-    "    choice = input(\"Enter choice: \").strip()\n",
-    "\n",
-    "    if choice == \"1\":\n",
-    "        name = input(\"Enter student name: \").strip().title()\n",
-    "        if not name:\n",
-    "            print(\"Name cannot be empty.\")\n",
-    "        elif name in students:\n",
-    "            print(\"Student already exists.\")\n",
-    "        else:\n",
-    "            students[name] = []\n",
-    "            print(\"Student added.\")\n",
-    "\n",
-    "    elif choice == \"2\":\n",
-    "        name = input(\"Enter student name: \").strip().title()\n",
-    "        if name not in students:\n",
-    "            print(\"Student not found.\")\n",
-    "            continue\n",
-    "\n",
-    "        date = input(\"Enter class date (DD-MM-YYYY): \").strip()\n",
-    "        status = input(\"Enter P for Present or A for Absent: \").strip().upper()\n",
-    "\n",
-    "        if not date or status not in (\"P\", \"A\"):\n",
-    "            print(\"Enter a date and a valid attendance status.\")\n",
-    "            continue\n",
-    "\n",
-    "        for record in students[name]:\n",
-    "            if record[\"date\"] == date:\n",
-    "                record[\"status\"] = status\n",
-    "                print(\"Attendance updated.\")\n",
-    "                break\n",
-    "        else:\n",
-    "            students[name].append({\"date\": date, \"status\": status})\n",
-    "            print(\"Attendance added.\")\n",
-    "\n",
-    "    elif choice == \"3\":\n",
-    "        if not students:\n",
-    "            print(\"No students added.\")\n",
-    "            continue\n",
-    "\n",
-    "        print(f\"\\nAttendance Report (minimum {threshold}%)\")\n",
-    "\n",
-    "        for name, records in students.items():\n",
-    "            if not records:\n",
-    "                print(f\"{name} | No attendance recorded\")\n",
-    "                continue\n",
-    "\n",
-    "            present = 0\n",
-    "            details = []\n",
-    "\n",
-    "            for record in records:\n",
-    "                details.append(f\"{record['date']}: {record['status']}\")\n",
-    "                if record[\"status\"] == \"P\":\n",
-    "                    present += 1\n",
-    "\n",
-    "            total = len(records)\n",
-    "            percentage = present / total * 100\n",
-    "            result = \"Below threshold\" if percentage < threshold else \"Meets threshold\"\n",
-    "\n",
-    "            print(f\"{name} | {', '.join(details)}\")\n",
-    "            print(f\"Present: {present}/{total} | {percentage:.2f}% | {result}\")\n",
-    "\n",
-    "    elif choice == \"4\":\n",
-    "        print(\"Program closed.\")\n",
-    "        break\n",
-    "\n",
-    "    else:\n",
-    "        print(\"Invalid choice.\")"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "id": "7d70e564",
-   "metadata": {},
-   "source": [
-    "Mini Project 2 — Sales Data Analyzer\n",
-    "\n",
-    "Question:\n",
-    "\n",
-    "Develop a Python-based sales data analyzer using lists and dictionaries to manage product names, quantities sold, and prices. The application should calculate total sales, identify the highest-selling product, and summarize product-wise sales performance.\n",
-    "\n",
-    "CODE:"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 2,
-   "id": "f812162f",
-   "metadata": {},
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "\n",
-      "1. Add or update product  2. Show sales summary  3. Exit\n",
-      "Product added.\n",
-      "\n",
-      "1. Add or update product  2. Show sales summary  3. Exit\n",
-      "\n",
-      "Product Sales Summary\n",
-      "Coke | Units: 30 | Revenue: Rs. 1200.00\n",
-      "Total sales: Rs. 1200.00\n",
-      "Highest-selling by units: Coke (30 units each)\n",
-      "\n",
-      "1. Add or update product  2. Show sales summary  3. Exit\n",
-      "Program closed.\n"
-     ]
-    }
-   ],
-   "source": [
-    "products = []\n",
-    "\n",
-    "while True:\n",
-    "    print(\"\\n1. Add or update product  2. Show sales summary  3. Exit\")\n",
-    "    choice = input(\"Enter choice: \").strip()\n",
-    "\n",
-    "    if choice == \"1\":\n",
-    "        name = input(\"Enter product name: \").strip().title()\n",
-    "\n",
-    "        try:\n",
-    "            quantity = int(input(\"Enter total quantity sold: \"))\n",
-    "            price = float(input(\"Enter price per unit: \"))\n",
-    "        except ValueError:\n",
-    "            print(\"Enter a whole number for quantity and a number for price.\")\n",
-    "            continue\n",
-    "\n",
-    "        if not name or quantity < 0 or not 0 <= price < float(\"inf\"):\n",
-    "            print(\"Enter a product name and valid non-negative values.\")\n",
-    "            continue\n",
-    "\n",
-    "        for product in products:\n",
-    "            if product[\"name\"] == name:\n",
-    "                product[\"quantity\"] = quantity\n",
-    "                product[\"price\"] = price\n",
-    "                print(\"Product updated.\")\n",
-    "                break\n",
-    "        else:\n",
-    "            products.append({\n",
-    "                \"name\": name,\n",
-    "                \"quantity\": quantity,\n",
-    "                \"price\": price\n",
-    "            })\n",
-    "            print(\"Product added.\")\n",
-    "\n",
-    "    elif choice == \"2\":\n",
-    "        if not products:\n",
-    "            print(\"No sales records available.\")\n",
-    "            continue\n",
-    "\n",
-    "        total_sales = 0\n",
-    "        highest_quantity = max(product[\"quantity\"] for product in products)\n",
-    "        top_products = []\n",
-    "\n",
-    "        print(\"\\nProduct Sales Summary\")\n",
-    "\n",
-    "        for product in products:\n",
-    "            name = product[\"name\"]\n",
-    "            quantity = product[\"quantity\"]\n",
-    "            price = product[\"price\"]\n",
-    "            revenue = quantity * price\n",
-    "            total_sales += revenue\n",
-    "\n",
-    "            print(f\"{name} | Units: {quantity} | Revenue: Rs. {revenue:.2f}\")\n",
-    "\n",
-    "            if quantity == highest_quantity:\n",
-    "                top_products.append(name)\n",
-    "\n",
-    "        print(f\"Total sales: Rs. {total_sales:.2f}\")\n",
-    "\n",
-    "        if highest_quantity == 0:\n",
-    "            print(\"No units sold yet.\")\n",
-    "        else:\n",
-    "            print(f\"Highest-selling by units: {', '.join(top_products)} \"\n",
-    "                  f\"({highest_quantity} units each)\")\n",
-    "\n",
-    "    elif choice == \"3\":\n",
-    "        print(\"Program closed.\")\n",
-    "        break\n",
-    "\n",
-    "    else:\n",
-    "        print(\"Invalid choice.\")"
-   ]
-  }
- ],
- "metadata": {
-  "kernelspec": {
-   "display_name": ".venv (3.9.6)",
-   "language": "python",
-   "name": "python3"
-  },
-  "language_info": {
-   "codemirror_mode": {
-    "name": "ipython",
-    "version": 3
-   },
-   "file_extension": ".py",
-   "mimetype": "text/x-python",
-   "name": "python",
-   "nbconvert_exporter": "python",
-   "pygments_lexer": "ipython3",
-   "version": "3.9.6"
-  }
- },
- "nbformat": 4,
- "nbformat_minor": 5
-}
+students = {}
+threshold = 75
+
+while True:
+    print("\n1. Add student  2. Mark or update attendance")
+    print("3. Display attendance  4. Exit")
+    choice = input("Enter choice: ").strip()
+
+    if choice == "1":
+        name = input("Enter student name: ").strip().title()
+        if not name:
+            print("Name cannot be empty.")
+        elif name in students:
+            print("Student already exists.")
+        else:
+            students[name] = []
+            print("Student added.")
+
+    elif choice == "2":
+        name = input("Enter student name: ").strip().title()
+        if name not in students:
+            print("Student not found.")
+            continue
+
+        date = input("Enter class date (DD-MM-YYYY): ").strip()
+        status = input("Enter P for Present or A for Absent: ").strip().upper()
+
+        if not date or status not in ("P", "A"):
+            print("Enter a date and a valid attendance status.")
+            continue
+
+        for record in students[name]:
+            if record["date"] == date:
+                record["status"] = status
+                print("Attendance updated.")
+                break
+        else:
+            students[name].append({"date": date, "status": status})
+            print("Attendance added.")
+
+    elif choice == "3":
+        if not students:
+            print("No students added.")
+            continue
+
+        print(f"\nAttendance Report (minimum {threshold}%)")
+
+        for name, records in students.items():
+            if not records:
+                print(f"{name} | No attendance recorded")
+                continue
+
+            present = 0
+            details = []
+
+            for record in records:
+                details.append(f"{record['date']}: {record['status']}")
+                if record["status"] == "P":
+                    present += 1
+
+            total = len(records)
+            percentage = present / total * 100
+            result = "Below threshold" if percentage < threshold else "Meets threshold"
+
+            print(f"{name} | {', '.join(details)}")
+            print(f"Present: {present}/{total} | {percentage:.2f}% | {result}")
+
+    elif choice == "4":
+        print("Program closed.")
+        break
+
+    else:
+        print("Invalid choice.")
+
+products = []
+
+while True:
+    print("\n1. Add or update product  2. Show sales summary  3. Exit")
+    choice = input("Enter choice: ").strip()
+
+    if choice == "1":
+        name = input("Enter product name: ").strip().title()
+
+        try:
+            quantity = int(input("Enter total quantity sold: "))
+            price = float(input("Enter price per unit: "))
+        except ValueError:
+            print("Enter a whole number for quantity and a number for price.")
+            continue
+
+        if not name or quantity < 0 or not 0 <= price < float("inf"):
+            print("Enter a product name and valid non-negative values.")
+            continue
+
+        for product in products:
+            if product["name"] == name:
+                product["quantity"] = quantity
+                product["price"] = price
+                print("Product updated.")
+                break
+        else:
+            products.append({
+                "name": name,
+                "quantity": quantity,
+                "price": price
+            })
+            print("Product added.")
+
+    elif choice == "2":
+        if not products:
+            print("No sales records available.")
+            continue
+
+        total_sales = 0
+        highest_quantity = max(product["quantity"] for product in products)
+        top_products = []
+
+        print("\nProduct Sales Summary")
+
+        for product in products:
+            name = product["name"]
+            quantity = product["quantity"]
+            price = product["price"]
+            revenue = quantity * price
+            total_sales += revenue
+
+            print(f"{name} | Units: {quantity} | Revenue: Rs. {revenue:.2f}")
+
+            if quantity == highest_quantity:
+                top_products.append(name)
+
+        print(f"Total sales: Rs. {total_sales:.2f}")
+
+        if highest_quantity == 0:
+            print("No units sold yet.")
+        else:
+            print(f"Highest-selling by units: {', '.join(top_products)} "
+                  f"({highest_quantity} units each)")
+
+    elif choice == "3":
+        print("Program closed.")
+        break
+
+    else:
+        print("Invalid choice.")
