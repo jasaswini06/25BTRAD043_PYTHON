@@ -1,3 +1,4 @@
+# Lab Exercise 5: Number Guessing Game
 import random
 
 number = random.randint(1, 10)
@@ -10,6 +11,9 @@ else:
     print("Wrong guess!")
     print("The correct number was:", number)
 
+print()
+
+# Lab Exercise 6: Prime Number and Factorial Programs
 number = int(input("Enter a number: "))
 
 if number > 1:
@@ -22,6 +26,8 @@ if number > 1:
 else:
     print(number, "is not a Prime Number")
 
+print()
+
 number = int(input("Enter a number: "))
 factorial = 1
 
@@ -30,6 +36,9 @@ for i in range(1, number + 1):
 
 print("Factorial of", number, "is", factorial)
 
+print()
+
+# Lab Exercise 7: Fibonacci Series Using Recursion
 def fibonacci(n):
     if n <= 1:
         return n
