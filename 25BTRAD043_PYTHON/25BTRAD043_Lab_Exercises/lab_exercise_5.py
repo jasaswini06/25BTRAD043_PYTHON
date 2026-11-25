@@ -1,3 +1,10 @@
+# LAB EXPERIMENT PART 5
+# Name: Jasaswini Sahu
+# USN: 25BTRAD043
+
+import random
+
+# Lab Exercise 14: Bank Account System Using OOP
 class BankAccount:
     def __init__(self, holder):
         self.holder = holder
@@ -33,6 +40,9 @@ account.withdraw(0)
 account.withdraw(800)
 print(f"Current balance: Rs. {account.check_balance()}")
 
+print()
+
+# Lab Exercise 15: Library Management System
 class LibraryItem:
     def __init__(self, title):
         self.title = title
@@ -71,9 +81,9 @@ book.return_item()
 book.return_item()
 book.display()
 
-import random
+print()
 
-
+# Lab Exercise 16: Dice Simulator Using the Random Module
 def roll_dice(number_of_dice, number_of_rounds):
     frequency = {face: 0 for face in range(1, 7)}
 

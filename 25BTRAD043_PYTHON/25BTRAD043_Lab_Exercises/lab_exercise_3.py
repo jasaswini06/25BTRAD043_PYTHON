@@ -1,3 +1,4 @@
+# Lab Exercise 8: Contact Book Using Lists and Dictionaries
 contacts = []
 
 while True:
@@ -54,6 +55,9 @@ while True:
         contacts.remove(found)
         print("Contact deleted.")
 
+print()
+
+# Lab Exercise 9: Student Grading System
 students = {}
 total = int(input("Enter number of students: "))
 
@@ -90,9 +94,11 @@ for name, marks in students.items():
 
     print(f"{name} - {marks}/100 - Grade {grade}")
 
+print()
+
+# Lab Exercise 10: Frequency Counter Using Dictionaries
 text = input("Enter a sentence or survey responses: ").lower()
 
-                                                          
 for symbol in ",.!?;:":
     text = text.replace(symbol, " ")
 

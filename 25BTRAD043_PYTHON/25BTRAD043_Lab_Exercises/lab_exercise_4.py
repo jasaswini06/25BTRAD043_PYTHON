@@ -1,7 +1,14 @@
+# LAB EXPERIMENT PART 4
+# Name: Jasaswini Sahu
+# USN: 25BTRAD043
+
 import re
+import json
+import csv
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from pathlib import Path
 
-                                                            
+# Lab Exercise 11: Log File Reader Program
 possible_paths = [
     Path.cwd() / "app.log",
     Path.cwd() / "25BTRAD043_Lab_Exercises" / "app.log",
@@ -19,7 +26,7 @@ if log_file is None:
 counts = {"ERROR": 0, "WARNING": 0, "INFO": 0}
 
 if log_file is None:
-    print("Log file not found. Save app.log beside lab_exercise_4.ipynb.")
+    print("Log file not found. Save app.log beside lab_exercise_4.py.")
 else:
     try:
         with open(log_file, "r", encoding="utf-8") as file:
@@ -37,11 +44,11 @@ else:
                 print(f"{keyword}: {count}")
 
     except FileNotFoundError:
-        print("Log file not found. Save app.log beside lab_exercise_4.ipynb.")
+        print("Log file not found. Save app.log beside lab_exercise_4.py.")
 
-import json
-from pathlib import Path
+print()
 
+# Lab Exercise 12: Student Data Manager Using Files
 base_dir = Path(__file__).resolve().parent if "__file__" in globals() else Path.cwd()
 data_file = base_dir / "students.json"
 
@@ -119,10 +126,9 @@ while True:
     else:
         print("Student updated.")
 
-import csv
-from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
-from pathlib import Path
+print()
 
+# Lab Exercise 13: CSV-Based Payroll Management System
 base_dir = Path(__file__).resolve().parent if "__file__" in globals() else Path.cwd()
 csv_file = base_dir / "employees.csv"
 required_columns = {
