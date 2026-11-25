@@ -1,9 +1,3 @@
-print("LAB EXPERIMENTS")
-print("Date: 31/07/2026")
-print("Name: Jasaswini Sahu")
-print("USN: 25BTRAD043")
-print()
-
 # LAB EXERCISE 1: Installing Python, Setting up VS Code / PyCharm, Jupyter Notebook
 # Steps:
 # 1. Download and install Python from the official Python website.
@@ -18,13 +12,13 @@ print()
 
 print()
 
-print("Lab Exercise 2: Write and execute a basic Python program.")
+#Lab Exercise 2: Write and execute a basic Python program.
 print("Hello, World!")
 print("Welcome to Python Programming")
 
 print()
 
-print("Lab Exercise 3: Programs using variables, operators, and input/output.")
+#Lab Exercise 3: Programs using variables, operators, and input/output.
 name = input("Enter your name: ")
 age = int(input("Enter your age: "))
 city = input("Enter your city: ")
@@ -43,7 +37,7 @@ print("Modulus:", a % b)
 
 print()
 
-print("Lab Exercise 4: Simple calculator and area calculation programs.")
+#Lab Exercise 4: Simple calculator and area calculation programs.
 a = float(input("Enter first number: "))
 b = float(input("Enter second number: "))
 print("Addition:", a + b)
