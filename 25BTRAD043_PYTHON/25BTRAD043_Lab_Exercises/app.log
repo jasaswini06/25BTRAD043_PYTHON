@@ -1,0 +1,8 @@
+2026-11-23 09:00:01 INFO Application started
+2026-11-23 09:05:12 INFO User logged in
+2026-11-23 09:10:45 WARNING Disk usage reached 80%
+2026-11-23 09:15:30 ERROR Database connection failed
+2026-11-23 09:16:10 INFO Retrying database connection
+2026-11-23 09:16:25 WARNING Retry attempt 1
+2026-11-23 09:17:00 ERROR Database connection timeout
+2026-11-23 09:18:20 INFO Application running normally

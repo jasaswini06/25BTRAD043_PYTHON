@@ -1,0 +1,5 @@
+employee_id,name,basic_salary,allowance,deduction_percent
+EMP001,Jasaswini Sahu,50000,5000,10
+EMP002,Rahul Sharma,60000,7500,12.5
+EMP003,Ananya Patel,45000,4000,8
+EMP004,Arjun Kumar,55000,6000,11.5

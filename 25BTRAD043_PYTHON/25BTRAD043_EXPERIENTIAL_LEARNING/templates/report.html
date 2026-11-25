@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block title %}Report an Item — Campus Findr{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto w-full">
+    <!-- Breadcrumb / Back Navigation -->
+    <a href="{{ url_for('index') }}" class="inline-flex items-center gap-1.5 text-xs text-[#55635b] hover:text-[#1c2520] mb-4 transition group">
+        <svg class="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+        </svg>
+        <span>Back to Registry Directory</span>
+    </a>
+
+    <!-- Header Card -->
+    <div class="bg-white border border-[#e6e2d8] rounded-lg p-6 shadow-subtle mb-6 animate-reveal-1">
+        <div class="flex items-center gap-2 mb-1">
+            <span class="inline-block w-2 h-2 rounded-full bg-[#2d5a43]"></span>
+            <span class="text-xs font-mono font-medium uppercase tracking-wider text-[#55635b]">Registry Filing Form</span>
+        </div>
+        <h1 class="text-xl sm:text-2xl font-semibold text-[#1c2520] tracking-tight">Report Campus Property</h1>
+        <p class="text-xs sm:text-sm text-[#55635b] mt-1">
+            Fill in the verification telemetry below. All entries are audited and coordinated with Campus Security.
+        </p>
+    </div>
+
+    <!-- Form Card -->
+    <form action="{{ url_for('report') }}" method="POST" enctype="multipart/form-data"
+          class="bg-white border border-[#e6e2d8] rounded-lg p-6 sm:p-7 shadow-subtle space-y-5 animate-reveal-2">
+
+        <!-- Lost / Found Radio Buttons -->
+        <div>
+            <label class="block font-medium text-xs text-[#1c2520] mb-1.5">Report Classification *</label>
+            <div class="grid grid-cols-2 gap-3">
+                <label class="flex items-center gap-2.5 p-3 rounded-md border border-[#e6e2d8] bg-[#fbfaf7] cursor-pointer hover:bg-white transition-colors has-[:checked]:border-[#2d5a43] has-[:checked]:bg-[#edf6f0]">
+                    <input type="radio" name="item_type" value="lost" checked class="text-[#2d5a43] focus:ring-[#2d5a43]" id="typeLost">
+                    <div>
+                        <span class="font-medium text-xs text-[#1c2520] block">Lost Item</span>
+                        <span class="text-[11px] text-[#7e8c84]">I misplaced my personal belonging</span>
+                    </div>
+                </label>
+                <label class="flex items-center gap-2.5 p-3 rounded-md border border-[#e6e2d8] bg-[#fbfaf7] cursor-pointer hover:bg-white transition-colors has-[:checked]:border-[#2d5a43] has-[:checked]:bg-[#edf6f0]">
+                    <input type="radio" name="item_type" value="found" class="text-[#2d5a43] focus:ring-[#2d5a43]" id="typeFound">
+                    <div>
+                        <span class="font-medium text-xs text-[#1c2520] block">Found Item</span>
+                        <span class="text-[11px] text-[#7e8c84]">I found misplaced property</span>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <!-- Title -->
+        <div>
+            <label for="title" class="block font-medium text-xs text-[#1c2520] mb-1.5">Item Title / Model Description *</label>
+            <input type="text" name="title" id="title" required maxlength="120"
+                   placeholder="e.g., Casio FX-991CW Scientific Calculator, Blue Realme Earbuds..."
+                   class="w-full px-3 py-2 text-xs rounded-md border border-[#e6e2d8] focus:ring-1 focus:ring-[#2d5a43] focus:border-[#2d5a43] bg-[#fbfaf7] focus:bg-white transition-colors text-[#1c2520] placeholder:text-[#7e8c84]">
+        </div>
+
+        <!-- Category -->
+        <div>
+            <label for="category" class="block font-medium text-xs text-[#1c2520] mb-1.5">Registry Category *</label>
+            <select name="category" id="category" required
+                    class="w-full px-3 py-2 text-xs rounded-md border border-[#e6e2d8] focus:ring-1 focus:ring-[#2d5a43] focus:border-[#2d5a43] bg-[#fbfaf7] focus:bg-white transition-colors text-[#1c2520]">
+                <option value="" disabled selected>Select category...</option>
+                <option value="electronics">Electronics (Laptop, Phone, Charger, Audio)</option>
+                <option value="id_card">ID Card / Wallet / Keys</option>
+                <option value="keys">Keys &amp; Vehicle FOB</option>
+                <option value="bottle">Bottle / Flask / Container</option>
+                <option value="books">Books / Notes / Stationery</option>
+                <option value="clothing">Clothing / Backpack</option>
+                <option value="other">Other Campus Property</option>
+            </select>
+        </div>
+
+        <!-- Description -->
+        <div>
+            <label for="description" class="block font-medium text-xs text-[#1c2520] mb-1.5">Identifying Characteristics / Marks *</label>
+            <textarea name="description" id="description" required rows="3" maxlength="1000"
+                      placeholder="Specify color, brand, stickers, keychains, scratches, serial numbers or distinctive markers..."
+                      class="w-full px-3 py-2 text-xs rounded-md border border-[#e6e2d8] focus:ring-1 focus:ring-[#2d5a43] focus:border-[#2d5a43] bg-[#fbfaf7] focus:bg-white transition-colors text-[#1c2520] placeholder:text-[#7e8c84] resize-y"></textarea>
+            <p class="text-[11px] text-[#7e8c84] mt-1 text-right"><span id="charCount">0</span>/1000</p>
+        </div>
+
+        <!-- Date & Location -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label for="date_occurred" class="block font-medium text-xs text-[#1c2520] mb-1.5">Date Incident Occurred *</label>
+                <input type="date" name="date_occurred" id="date_occurred" required
+                       class="w-full px-3 py-2 text-xs rounded-md border border-[#e6e2d8] focus:ring-1 focus:ring-[#2d5a43] focus:border-[#2d5a43] bg-[#fbfaf7] focus:bg-white transition-colors text-[#1c2520]">
+            </div>
+            <div>
+                <label for="location" class="block font-medium text-xs text-[#1c2520] mb-1.5">Campus Location *</label>
+                <input type="text" name="location" id="location" required maxlength="200"
+                       placeholder="e.g. CR-301, Central Library 2nd Floor"
+                       class="w-full px-3 py-2 text-xs rounded-md border border-[#e6e2d8] focus:ring-1 focus:ring-[#2d5a43] focus:border-[#2d5a43] bg-[#fbfaf7] focus:bg-white transition-colors text-[#1c2520] placeholder:text-[#7e8c84]">
+            </div>
+        </div>
+
+        <!-- Deposit Location (Found items only) -->
+        <div id="depositField" class="hidden">
+            <label for="deposit_location" class="block font-medium text-xs text-[#1c2520] mb-1.5">
+                Custody Drop-off Location
+                <span class="font-normal text-[#7e8c84]">(Where did you deposit the item?)</span>
+            </label>
+            <input type="text" name="deposit_location" id="deposit_location" maxlength="200"
+                   placeholder="e.g. Deposited at Security Desk Room 004, or Left with Lab Assistant"
+                   class="w-full px-3 py-2 text-xs rounded-md border border-[#e6e2d8] focus:ring-1 focus:ring-[#2d5a43] focus:border-[#2d5a43] bg-[#fbfaf7] focus:bg-white transition-colors text-[#1c2520] placeholder:text-[#7e8c84]">
+        </div>
+
+        <!-- Contact Email -->
+        <div>
+            <label for="contact_email" class="block font-medium text-xs text-[#1c2520] mb-1.5">Student / Faculty Email *</label>
+            <input type="email" name="contact_email" id="contact_email" required maxlength="120"
+                   placeholder="yourname@college.edu"
+                   class="w-full px-3 py-2 text-xs rounded-md border border-[#e6e2d8] focus:ring-1 focus:ring-[#2d5a43] focus:border-[#2d5a43] bg-[#fbfaf7] focus:bg-white transition-colors text-[#1c2520] placeholder:text-[#7e8c84]">
+        </div>
+
+        <!-- Photo Attachment -->
+        <div>
+            <label class="block font-medium text-xs text-[#1c2520] mb-1.5">Photo Attachment (Optional)</label>
+            <input type="file" name="photo" id="report-photo" accept="image/jpeg,image/png"
+                   class="w-full px-3 py-2 text-xs rounded-md border border-[#e6e2d8] bg-[#fbfaf7] file:mr-3 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-medium file:bg-[#2d5a43] file:text-white hover:file:bg-[#143426] cursor-pointer">
+            <p class="text-[11px] text-[#7e8c84] mt-1">Accepts JPEG or PNG up to 5 MB.</p>
+            <img id="imagePreview" class="mt-2 max-h-48 rounded border border-[#e6e2d8] hidden object-contain" alt="Preview">
+        </div>
+
+        <!-- Submission Buttons -->
+        <div class="pt-3 border-t border-[#e6e2d8] flex items-center justify-end gap-2.5">
+            <a href="{{ url_for('index') }}" class="px-3.5 py-2 rounded-md border border-[#e6e2d8] text-xs font-medium text-[#55635b] hover:bg-[#f5f3ee] transition-colors">
+                Cancel
+            </a>
+            <button type="submit" class="px-4 py-2 rounded-md bg-[#2d5a43] hover:bg-[#143426] text-white font-medium text-xs shadow-subtle transition-all duration-150 ease-out hover:-translate-y-[1px] active:translate-y-0">
+                Submit Registry Entry
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Character counter
+    const desc = document.getElementById('description');
+    const charCount = document.getElementById('charCount');
+    if (desc && charCount) {
+        desc.addEventListener('input', () => { charCount.textContent = desc.value.length; });
+    }
+
+    // Toggle deposit location
+    const typeLost = document.getElementById('typeLost');
+    const typeFound = document.getElementById('typeFound');
+    const depositField = document.getElementById('depositField');
+    function updateDepositVisibility() {
+        if (typeFound && typeFound.checked) {
+            depositField.classList.remove('hidden');
+        } else if (depositField) {
+            depositField.classList.add('hidden');
+        }
+    }
+    if (typeLost && typeFound) {
+        typeLost.addEventListener('change', updateDepositVisibility);
+        typeFound.addEventListener('change', updateDepositVisibility);
+        updateDepositVisibility();
+    }
+
+    // Default date to today
+    const dateInput = document.getElementById('date_occurred');
+    if (dateInput && !dateInput.value) {
+        dateInput.value = new Date().toISOString().split('T')[0];
+    }
+</script>
+{% endblock %}
