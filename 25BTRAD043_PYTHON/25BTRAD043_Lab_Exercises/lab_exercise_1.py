@@ -4,17 +4,17 @@ print("Name: Jasaswini Sahu")
 print("USN: 25BTRAD043")
 print()
 
-print("Lab Exercise 1: Installing Python, Setting up VS Code / PyCharm, Jupyter Notebook")
-print("Steps:")
-print("1. Download and install Python from the official Python website.")
-print("2. Open the Python installer and complete the installation.")
-print("3. Install VS Code or PyCharm as the code editor.")
-print("4. Install the Python extension in VS Code if using VS Code.")
-print("5. Install Jupyter Notebook using Python.")
-print("6. Open VS Code / PyCharm / Jupyter Notebook.")
-print("7. Create a new Python file with the .py extension.")
-print("8. Write a simple Python program.")
-print("9. Run the program and check the output.")
+# LAB EXERCISE 1: Installing Python, Setting up VS Code / PyCharm, Jupyter Notebook
+# Steps:
+# 1. Download and install Python from the official Python website.
+# 2. Open the Python installer and complete the installation.
+# 3. Install VS Code or PyCharm as the code editor.
+# 4. Install the Python extension in VS Code if using VS Code.
+# 5. Install Jupyter Notebook using Python.
+# 6. Open VS Code / PyCharm / Jupyter Notebook.
+# 7. Create a new Python file with the .py extension.
+# 8. Write a simple Python program.
+# 9. Run the program and check the output.
 
 print()
 
