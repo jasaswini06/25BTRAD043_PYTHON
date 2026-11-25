@@ -1,3 +1,4 @@
+# Attendance Tracker
 students = {}
 threshold = 75
 
@@ -72,6 +73,9 @@ while True:
     else:
         print("Invalid choice.")
 
+print()
+
+# Sales Dashboard
 products = []
 
 while True:
